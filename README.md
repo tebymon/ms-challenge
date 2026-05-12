@@ -16,6 +16,7 @@ REST API construida con Java 21 + Spring Boot 3 para el challenge técnico de Ba
 - [Endpoints](#endpoints)
 - [Manejo de errores](#manejo-de-errores)
 - [Tests](#tests)
+- [Usar Claude en este proyecto](#usar-claude-en-este-proyecto)
 - [Docker Hub](#docker-hub)
 
 ---
@@ -316,6 +317,42 @@ mvn test -Dtest="CalculationDtoTest,CalculatorServiceTest,RateLimitInterceptorTe
 | Web layer  | `CalculatorApiImplTest`       | 200 happy path, 400 validation, 400 JSON malformado, 503 (4 tests)                   |
 
 `CalculatorApiImplTest` usa `@WebMvcTest` con `MockMvc` y `@MockBean` — verifica que `GlobalExceptionHandler` se ejecuta y que `HistoryService.saveAsync` se invoca para cada caso de error.
+
+---
+
+## Usar Claude en este proyecto
+
+Este repo viene con un archivo `CLAUDE.md` en la raíz que define las reglas y convenciones del proyecto. Si usás **Claude Code** (la herramienta de Anthropic en la terminal o el plugin del IDE), Claude lee ese archivo automáticamente al abrir el proyecto. No necesitás copiar/pegar nada — ya conoce el contexto.
+
+### ¿Para qué te puede servir?
+
+- **Revisar un PR antes de pedirle review a un humano.** Claude lo mira con las pautas del equipo, marca posibles bugs, problemas de diseño, código sucio o reglas violadas (más de 5 dependencias, menos del 80% de cobertura, etc.).
+- **Escribir tests faltantes.** Le pasás una clase y te genera los tests siguiendo el estilo del proyecto.
+- **Entender código que no escribiste.** Pedile que te explique cómo funciona alguna parte.
+- **Refactorizar con seguridad.** Te ayuda a mover, renombrar o partir clases sin romper nada.
+- **Generar la descripción del PR** con un resumen y los archivos tocados.
+
+### ¿Cómo se usa?
+
+1. Instalá Claude Code (una sola vez): https://claude.com/claude-code
+2. Abrí una terminal dentro de la carpeta del proyecto.
+3. Escribí `claude` y arrancá una conversación.
+
+### Ejemplos de frases que podés usarle
+
+> "Revisá los cambios del PR actual contra las reglas del CLAUDE.md."
+
+> "Generá tests unitarios para `PercentageServiceImpl`."
+
+> "Explicame cómo se guarda el historial cuando hay un 429."
+
+> "Necesito agregar un endpoint nuevo `/api/v1/refund`. Seguí los lineamientos REST del CLAUDE.md."
+
+> "Esta clase tiene 6 dependencias inyectadas. ¿Cómo la podemos partir?"
+
+### ¿Y si no quiero usarlo?
+
+No pasa nada — el `CLAUDE.md` es solo para Claude. El proyecto compila, corre y se testea sin él. Tu IDE, tu flujo de trabajo y tus reviews humanos siguen funcionando igual.
 
 ---
 
