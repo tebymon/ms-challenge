@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: ms-challenge
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:tenpo}
+    username: ${DB_USER:tenpo}
+    password: ${DB_PASSWORD:tenpo}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# Resilience4j - Reintentos para servicio externo
+resilience4j:
+  retry:
+    instances:
+      externalPercentage:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - java.io.IOException
+
+# Rate Limiting: 3 RPM
+rate-limit:
+  capacity: 3
+  refill-tokens: 3
+  refill-period-minutes: 1
+
+http-client:
+  percentage-service:
+    base-url: ${PERCENTAGE_SERVICE_URL:http://localhost:9090}
+    connect-timeout: 3000
+    read-timeout: 5000
+    logging-level: BASIC
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

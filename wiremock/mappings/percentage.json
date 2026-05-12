@@ -1,0 +1,21 @@
+{
+  "mappings": [
+    {
+      "id": "3f4a6b2e-1c8d-4e7a-9b5f-2d0e8c3a7f61",
+      "name": "GET /percentage - Mock del servicio externo",
+      "request": {
+        "method": "GET",
+        "url": "/percentage"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "percentage": 10.0
+        }
+      }
+    }
+  ]
+}

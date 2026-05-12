@@ -1,0 +1,49 @@
+# ─── Build output ───
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# ─── Maven ───
+.mvn/
+mvnw
+mvnw.cmd
+dependency-reduced-pom.xml
+
+# ─── IDEs ───
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+.factorypath
+.apt_generated/
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Logs ───
+*.log
+logs/
+spring.log
+
+# ─── Local config & secrets ───
+.env
+.env.local
+application-local.yml
+application-local.properties
+
+# ─── Claude / agent caches ───
+.claude/
+
+# ─── Test reports ───
+*.iml
+.surefire-*
+hs_err_pid*.log
