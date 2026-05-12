@@ -7,7 +7,6 @@ REST API construida con Java 21 + Spring Boot 3 para el challenge técnico de Ba
 ## Tabla de contenidos
 
 - [Descripción](#descripción)
-- [Cumplimiento de requerimientos](#cumplimiento-de-requerimientos)
 - [Tecnologías](#tecnologías)
 - [Arquitectura](#arquitectura)
 - [Decisiones técnicas](#decisiones-técnicas)
@@ -31,27 +30,6 @@ API REST que calcula `(num1 + num2) + porcentaje%` aplicando un porcentaje diná
 - Manejo centralizado de errores 4xx/5xx
 - Persistencia en PostgreSQL via Flyway
 - Documentación OpenAPI (Swagger UI)
-
----
-
-## Cumplimiento de requerimientos
-
-| # | Requerimiento | Estado | Implementación |
-|---|---|---|---|
-| 1 | Endpoint que recibe `num1` y `num2`, suma + porcentaje externo | ✅ | `POST /api/v1/calculate` |
-| 2 | Servicio externo con mock que retorna porcentaje fijo (10%) | ✅ | WireMock en `:9090/percentage` |
-| 3 | Retry de 3 intentos antes de error | ✅ | Resilience4j `@Retry`, 500ms entre intentos |
-| 4 | Endpoint de historial paginado con fecha, endpoint, parámetros y respuesta/error | ✅ | `GET /api/v1/history?page=&size=` |
-| 5 | Registro asíncrono que no afecta el tiempo de respuesta | ✅ | `@Async` con thread pool dedicado |
-| 6 | Rate limit de 3 RPM con 429 y mensaje descriptivo | ✅ | Bucket4j + `RateLimitInterceptor` |
-| 7 | Manejo de errores 4xx/5xx con mensajes descriptivos | ✅ | `GlobalExceptionHandler` (`@RestControllerAdvice`) |
-| 8 | PostgreSQL en Docker, configurada en Docker Compose | ✅ | `postgres:16-alpine` en `docker-compose.yml` |
-| 9 | API en contenedor Docker | ✅ | Multi-stage `Dockerfile` |
-| 10 | Imagen publicada en Docker Hub | ⚠️ | Ver sección [Docker Hub](#docker-hub) |
-| 11 | Documentación con Swagger o Postman | ✅ | SpringDoc OpenAPI en `/swagger-ui.html` |
-| 12 | **Bonus**: WebFlux / programación reactiva | ❌ | Se optó por stack MVC + Retrofit (justificado abajo) |
-| 13 | **Bonus**: Tests unitarios | ✅ | 17 tests (unit + web layer) |
-| 14 | **Bonus**: Análisis de decisiones técnicas en README | ✅ | Sección [Decisiones técnicas](#decisiones-técnicas) |
 
 ---
 
@@ -136,13 +114,6 @@ Client → RequestBodyCachingFilter (cache body for error logging)
 
 ### `BigDecimal` para los cálculos
 Se usa `BigDecimal` en lugar de `double`/`float` para evitar pérdida de precisión. En operaciones financieras `0.1 + 0.2 == 0.30000000000000004` con `double`; con `BigDecimal` el resultado es exacto.
-
-### Stack MVC en lugar de WebFlux (Bonus declinado)
-Aunque WebFlux era bonus, se eligió Spring MVC porque:
-- El proyecto es **I/O-bound puntual** (una llamada externa por request, no fan-out a múltiples servicios)
-- JPA bloqueante es el cuello de botella natural — WebFlux con `@Async` sobre JPA introduce complejidad sin beneficio real
-- El ecosistema Tenpo (asumido) probablemente ya tiene microservicios MVC, manteniendo consistencia
-- El equipo de revisores puede leer Mono/Flux como ruido si no es estrictamente necesario
 
 ### Retrofit 2 + OkHttp3 para el cliente HTTP
 Retrofit da una interfaz declarativa limpia. OkHttp3 expone timeouts (`connectTimeout`, `readTimeout`) y `HttpLoggingInterceptor` configurables vía `application.yml` bajo `http-client.*`. Toda la configuración del cliente se centraliza en `EndpointsConfig` con el pattern `@Bean + @ConfigurationProperties` (un bean `Endpoint` por servicio externo).
