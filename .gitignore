@@ -42,6 +42,9 @@ application-local.properties
 
 # ─── Claude / agent caches ───
 .claude/
+**/.claude/
+.claude*
+CLAUDE.md
 
 # ─── Test reports ───
 *.iml
