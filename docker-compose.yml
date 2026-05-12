@@ -43,9 +43,7 @@ services:
   # ms-challenge API
   # ──────────────────────────────────────────────
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: tebymon/ms-challenge:1.0.0
     container_name: ms-challenge-api
     ports:
       - "8080:8080"

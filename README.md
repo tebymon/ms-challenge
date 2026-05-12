@@ -159,11 +159,13 @@ Cada registro de historial incluye la IP de origen (`client_ip`). El `ClientIpRe
 ### Opción 1: Docker Compose (recomendado)
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/tebymon/ms-challenge.git
 cd ms-challenge
 
-docker compose up --build
+docker compose up -d
 ```
+
+La API tira de la imagen publicada en Docker Hub (`tebymon/ms-challenge:1.0.0`). No requiere compilar local.
 
 Servicios levantados:
 - **API** → http://localhost:8080
@@ -358,16 +360,18 @@ No pasa nada — el `CLAUDE.md` es solo para Claude. El proyecto compila, corre 
 
 ## Docker Hub
 
-> **TODO antes de entregar:** publicar la imagen en Docker Hub y reemplazar este bloque.
+Imagen publicada: **[tebymon/ms-challenge](https://hub.docker.com/r/tebymon/ms-challenge)**
 
-Para publicar:
 ```bash
-docker build -t <usuario>/ms-challenge:1.0.0 .
-docker push <usuario>/ms-challenge:1.0.0
+docker pull tebymon/ms-challenge:1.0.0
 ```
 
-Luego actualizar `docker-compose.yml` para usar la imagen publicada (en lugar de `build: .`):
-```yaml
-api:
-  image: <usuario>/ms-challenge:1.0.0
+Tags disponibles:
+- `tebymon/ms-challenge:1.0.0` — versión inmutable
+- `tebymon/ms-challenge:latest` — último build
+
+El `docker-compose.yml` ya está configurado para tirar de la imagen del registry (no compila local). Para levantar todo:
+
+```bash
+docker compose up -d
 ```
