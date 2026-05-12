@@ -148,38 +148,18 @@ Reglas de formato:
 - Múltiples palabras con **kebab-case**: `personal-info` (no `personalInfo` ni `personal_info`).
 - Consistencia en referencias, recursos, entidades y parámetros.
 
-### 6.2 Métodos HTTP
-Todos idempotentes excepto POST. GET debe ser **seguro** (no muta estado).
-
-- **GET** — consultas. Sin body.
-  - Lista: `GET /clients` → array de DTOs.
-  - Individual: `GET /clients/{id}` → DTO.
-- **POST** — creación. Body con atributos.
-- **PUT** — crear o reemplazar recurso **completo**.
-- **PATCH** — actualización **parcial**.
-- **DELETE** — eliminar por ID.
-- **HEAD** — como GET pero sin body en response.
-- **OPTIONS** — describir opciones de comunicación.
-
-### 6.3 Composición de paths
+### 6.2 Prefijos de autenticación
 Estructura: `/{service-name}/{prefix}/{resource-path}`.
 
-- **service-name**: nombre del microservicio (`customer`, `partner`, `discount`).
-- **prefix**: identifica autenticación:
-  - `b2c` — usuarios persona (token b2c via API Gateway). Datos solo del usuario autenticado (usar ID del token, no del request).
-  - `b2b` — usuarios empresa (token b2b via API Gateway).
-  - `bo` — back-office (token bo).
-  - `ext` — servicios externos sin token. No info sensible.
-  - `iuse` — uso interno entre microservicios. Solo accesible privadamente.
-  - `sfc` — comunicación exclusiva con Salesforce. Privado.
-  - `notification` — webhooks de proveedores. API Gateway separado con API Key.
-- **resource-path**: el recurso específico.
+- `b2c` — usuarios persona (token b2c via API Gateway). Datos solo del usuario autenticado (usar ID del token, no del request).
+- `b2b` — usuarios empresa (token b2b via API Gateway).
+- `bo` — back-office (token bo).
+- `ext` — servicios externos sin token. No info sensible.
+- `iuse` — uso interno entre microservicios. Solo accesible privadamente.
+- `sfc` — comunicación exclusiva con Salesforce. Privado.
+- `notification` — webhooks de proveedores. API Gateway separado con API Key.
 
-### 6.4 Request/Response bodies
-- **Siempre DTOs** en request y response. Nunca entities, Strings, Maps, ni wrappers ambiguos.
-- DTOs anotados con `@Schema` y validaciones (`@NotNull`, `@NotBlank`, etc.).
-
-### 6.5 Versionado
+### 6.3 Versionado
 - Header `X-Api-Version` (case-insensitive, RFC 2616).
 - Default: `@RequestHeader(value = "X-API-VERSION", defaultValue = "1")`.
 - Versión específica: `@GetMapping(..., headers = "X-API-VERSION=2")`.
@@ -250,116 +230,7 @@ servers = {
 
 ---
 
-## 8. Generador de README para PRs
-
-Cuando se pida generar el README del PR (para pegar en la descripción), seguir este template. Máximo **4800 caracteres** (reserva de 200 para ajustes).
-
-### Validación previa
-Si detectás typos en código (variables, métodos, clases mal escritos), **frená** y devolvé el listado de typos con sugerencias antes de generar el README. Ejemplos: `campignType` → `campaignType`, `retreive()` → `retrieve()`, `CostumerService` → `CustomerService`.
-
-### Categorización de cambios
-- **Alta prioridad:** Controllers, Services, DTOs (lógica de negocio).
-- **Media prioridad:** Repositories, Configurations.
-- **Baja prioridad:** Tests, formato, imports.
-
-### Detección de impacto
-- **Dependencias externas** = SÍ si hay interfaces Retrofit nuevas o anotaciones `@GET/@POST/@PUT` con endpoints nuevos.
-- **API Gateway** = SÍ si hay `@RestController` con `@RequestMapping` y el controller **no** tiene sufijo `iuse`.
-- **Cambios BD** = SÍ si hay archivos `.yaml` con migraciones o scripts SQL en `src/main/resources/db/migration/`.
-
-### Template
-
-```markdown
-# PR: <Título conciso del cambio principal>
-
----
-
-## Información del PR
-
-| Campo | Valor |
-|-------|-------|
-| Encargado | <Nombre> |
-| Ticket | [GROW-XXXX](https://global66.atlassian.net/browse/GROW-XXXX) |
-| Dependencias | [Sí / No] |
-| API Gateway | [Sí / No] |
-| Cambios BD | [Sí / No] |
-
----
-
-## Resumen ejecutivo
-
-<2-3 líneas de propósito y alcance técnico>
-
-### Punto de entrada para review
-Comenzar por: `<NombreClaseEstrategia>` — <razón: entry point principal / controller base / service core / etc.>
-
-### Cambios implementados
-- <Cambio 1: capa de presentación>
-- <Cambio 2: lógica de negocio>
-- <Cambio 3: capa de datos>
-- <Cambio N: tests y validaciones>
-
----
-
-## Modificaciones técnicas
-
-### [Tipo] [Nueva / Modificada] `NombreClase`
-Ruta: `ruta/completa/archivo.java`
-
-Cambio: <descripción técnica precisa>
-
-```java
-// Solo las líneas clave del diff
-```
-
----
-
-## Índice de clases modificadas
-
-### Clases nuevas
-- `ClaseNueva1` — <propósito en ≤ 8 palabras>
-- `ClaseNueva2` — <propósito en ≤ 8 palabras>
-
-### Clases modificadas
-- `ClaseExistente1` — <tipo de cambio + impacto en ≤ 10 palabras>
-- `ClaseExistente2` — <tipo de cambio + impacto en ≤ 10 palabras>
-
----
-
-## Cobertura de testing
-
-Métodos de prueba afectados:
-- `nombreMetodoTest1()`
-- `nombreMetodoTest2()`
-
----
-
-## Resumen de impacto
-
-| Categoría | Archivos |
-|-----------|----------|
-| Clases nuevas | <lista o "Ninguna"> |
-| Lógica modificada | <lista o "Ninguna"> |
-| Solo formato | <lista o "Ninguna"> |
-
----
-
-Impacto: este PR <mejora / implementa / optimiza> <funcionalidad específica> manteniendo estándares de código y cobertura ≥ 80%.
-```
-
-### Criterios de exclusión del README
-- Archivos con solo cambios de indentación.
-- Reordenamiento de imports sin lógica nueva.
-- Comentarios de documentación sin cambios funcionales.
-
-### Optimización si excede 4800 caracteres
-1. Reducir bloques de código a las líneas estrictamente esenciales.
-2. Convertir el "Índice de clases" a formato más conciso.
-3. Priorizar info arquitectónica sobre detalles de implementación.
-
----
-
-## 9. Cosas que NO hacer
+## 8. Cosas que NO hacer
 
 - ❌ Wildcard imports (`import x.y.*`).
 - ❌ Más de 5 dependencias inyectadas en una clase.
